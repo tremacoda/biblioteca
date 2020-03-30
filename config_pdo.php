@@ -13,12 +13,18 @@ private $dbname = "biblioteca";
 public function __construct()
 {
   $this->conn = new mysqli($this->servername, $this->username, $this->password, $this->dbname);
- 
   /* check connection */
   if ($this->conn->connect_errno) {
   printf("Connect failed: %s\n", $this->conn->connect_error);
   exit();
-}
+  }
+
+ //try {
+ // $this->conn = new PDO ("mysql:host=$this->servername;dbname=$this->dbname", $this->username, $this->password);
+ //} catch (PDOException $e) {
+ // echo "Errore: " . $e->getMessage();
+ // die();
+ //}
   
 } // end construct
 
