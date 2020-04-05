@@ -5,6 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome",
+            "url": "http://localhost/biblioteca/test_form.php",
+            "webRoot": "${workspaceFolder}"
+        },
+    
+        {
             "name": "Launch built-in server",
             "type": "php",
             "request": "launch",
@@ -16,9 +24,13 @@
             ],
             "port": 9000,
             "serverReadyAction": {
-                "action": "openExternally"
+                "pattern": "listening on port ([0-9]+)",
+                "uriFormat": "http://localhost:%s",
+                "webRoot": "${workspaceFolder}",
+                "action": "debugWithChrome"
             }
         },
+
         {
             "name": "Launch current script in console",
             "type": "php",
