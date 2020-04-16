@@ -1,6 +1,6 @@
 <?php
 
-$mysqli = new mysqli('localhost', 'root', '', 'corso_2016');
+$mysqli = new mysqli('localhost', 'root', '', 'corso');
 if ($mysqli->connect_error) {
     die('Errore di connessione (' . $mysqli->connect_errno . ') '. $mysqli->connect_error);
 }
@@ -55,10 +55,9 @@ function lista() {
 	$page = 1;
 	if(isset($_GET['page'])){$page = filter_var($_GET['page'],FILTER_SANITIZE_NUMBER_INT);}
 	$tot_pagine = ceil($tot_records/$perpage);
-	$pagina_corrente = $page;
+ 	$pagina_corrente = $page;
 	$primo = ($pagina_corrente-1)*$perpage;
 	$sql = 'SELECT * FROM utenti ORDER BY id DESC LIMIT '.$primo.','.$perpage.' ';
-
 	$result = $mysqli->query($sql);
 	while($row = $result->fetch_array(MYSQLI_ASSOC)){
 		$out.='<tr>';
@@ -103,6 +102,8 @@ function salva() {
 
 function elimina() {
 	global $id, $mysqli;
+	$id=0;
+	if(isset($_REQUEST['id'])){$id = filter_var($_GET['id'],FILTER_SANITIZE_NUMBER_INT);}
 	$sql='DELETE FROM utenti WHERE id=? LIMIT 1  ';
 	$result = $mysqli->prepare($sql);
 	$result->bind_param('i', $id);
@@ -111,10 +112,13 @@ function elimina() {
 	
 function form() {
 	global $id, $mysqli;
+	$id=0;
+	if(isset($_REQUEST['id'])){$id = filter_var($_GET['id'],FILTER_SANITIZE_NUMBER_INT);}
 	$sql="SELECT * FROM utenti WHERE id=?";
-	$query = $mysqli->prepare($sql);
-	$query->bind_param('i', $id);
-	$result=$query->execute();
+	$stmt = $mysqli->prepare($sql);
+	$stmt->bind_param('i', $id);
+	$stmt->execute();
+	$result=$stmt->get_result();	
 	$row = $result->fetch_array(MYSQLI_ASSOC);
 	$out='';
 	$out.='<form name="info" action="'.$_SERVER['PHP_SELF'].'" method="post">';
@@ -130,15 +134,30 @@ function form() {
 
 function dettaglio() {
 	global $id, $mysqli;
+	$id=0;
+	if(isset($_REQUEST['id'])){$id = filter_var($_GET['id'],FILTER_SANITIZE_NUMBER_INT);}
 	$sql="SELECT * FROM utenti WHERE id=?";
-	$query = $mysqli->prepare($sql);
-	$query->bind_param('i', $id);
-	$result = $query->execute();
-	$row = $result->fetch_array(MYSQLI_ASSOC);
-	$out='Nome: '.$row['nome'].' ';
-	$out.='Cognome: '.$row['cognome'].' ';
-	$out.='Email: '.$row['email'].' ';
-	return($out);
+	$stmt = $mysqli->prepare($sql);
+	$stmt->bind_param('i', $id);
+	if ($stmt->execute()){
+		$result=$stmt->get_result();
+		$row = $result->fetch_array(MYSQLI_ASSOC);
+		$out='<table class="table">';
+		$out.='<thead>';
+		$out.='<tr><th>Id</th><th>Nome</th><th>Cognome</th><th>Email</th>';
+		$out.='</thead>';
+		$out.='<tr>';
+		$out.='<td>'.$row['id'].'</td>';
+		$out.='<td>'.$row['nome'].'</td>';
+		$out.='<td>'.$row['cognome'].'</td>';
+		$out.='<td>'.$row['email'].'</td>';
+		$out.='</tr>';
+		$out.='</table>';
+		return($out);
+	} else {
+		echo "0 results";
+	};
+	
 	}		
 	
 ?>
